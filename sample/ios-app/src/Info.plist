@@ -60,5 +60,9 @@
 	</array>
 	<key>NSContactsUsageDescription</key>
 	<string>Just for tests</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Just for tests</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Just for tests</string>
 </dict>
 </plist>
