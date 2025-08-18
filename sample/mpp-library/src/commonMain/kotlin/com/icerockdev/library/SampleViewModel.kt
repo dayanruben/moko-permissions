@@ -8,9 +8,7 @@ import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.PermissionsController
-import dev.icerock.moko.permissions.location.BACKGROUND_LOCATION
-import dev.icerock.moko.permissions.location.COARSE_LOCATION
-import dev.icerock.moko.permissions.location.LOCATION
+import dev.icerock.moko.permissions.contacts.CONTACTS
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,7 +18,7 @@ class SampleViewModel(
     val permissionsController: PermissionsController
 ) : ViewModel(), EventsDispatcherOwner<SampleViewModel.EventListener> {
 
-    private val permissionType = Permission.COARSE_LOCATION
+    private val permissionType = Permission.CONTACTS
     val permissionState = MutableStateFlow(PermissionState.NotDetermined)
 
     init {
