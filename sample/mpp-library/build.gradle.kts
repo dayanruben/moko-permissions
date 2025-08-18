@@ -8,12 +8,17 @@ plugins {
     id("dev.icerock.moko.gradle.detekt")
 }
 
+android {
+    namespace = "com.icerockdev.library"
+}
+
 dependencies {
     commonMainImplementation(libs.coroutines)
 
     commonMainApi(libs.mokoMvvmCore)
     commonMainApi(projects.permissions)
     commonMainImplementation(projects.permissionsContacts)
+    commonMainImplementation(projects.permissionsLocation)
 
     androidMainImplementation(libs.lifecycle)
 

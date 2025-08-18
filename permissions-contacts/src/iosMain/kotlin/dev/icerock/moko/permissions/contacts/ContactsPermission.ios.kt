@@ -70,9 +70,10 @@ private class ContactsPermissionDelegate(
     }
 }
 
-// declared as constant because at now we use kotlin 1.9.10 that not know about 
+// declared as constant because at now we use kotlin 1.9.10 that not know about
 // platform.Contacts.CNAuthorizationStatusLimited
 @Suppress("TopLevelPropertyNaming")
 private const val CNAuthorizationStatusLimited: Long = 4
 
 actual val contactsDelegate: PermissionDelegate = ContactsPermissionDelegate(ContactPermission)
+actual val readContactsDelegate: PermissionDelegate = ContactsPermissionDelegate(ReadContactPermission)
