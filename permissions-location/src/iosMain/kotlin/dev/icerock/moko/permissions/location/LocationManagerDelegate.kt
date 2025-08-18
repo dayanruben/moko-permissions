@@ -8,7 +8,10 @@ import platform.CoreLocation.CLAuthorizationStatus
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.CLLocationManagerDelegateProtocol
 import platform.darwin.NSObject
+import kotlin.experimental.ExperimentalObjCName
 
+@OptIn(ExperimentalObjCName::class)
+@ObjCName("LocationManagerDelegate")
 internal class LocationManagerDelegate : NSObject(), CLLocationManagerDelegateProtocol {
     private var callback: ((CLAuthorizationStatus) -> Unit)? = null
 
@@ -16,6 +19,10 @@ internal class LocationManagerDelegate : NSObject(), CLLocationManagerDelegatePr
 
     init {
         locationManager.delegate = this
+    }
+
+    fun authorizationStatus(): CLAuthorizationStatus {
+        return locationManager.authorizationStatus
     }
 
     fun requestWhenInUseAuthorization(callback: (CLAuthorizationStatus) -> Unit) {
@@ -30,11 +37,9 @@ internal class LocationManagerDelegate : NSObject(), CLLocationManagerDelegatePr
         locationManager.requestAlwaysAuthorization()
     }
 
-    override fun locationManager(
-        manager: CLLocationManager,
-        didChangeAuthorizationStatus: CLAuthorizationStatus
-    ) {
-        callback?.invoke(didChangeAuthorizationStatus)
+    override fun locationManagerDidChangeAuthorization(manager: CLLocationManager) {
+        val authorizationStatus: CLAuthorizationStatus = manager.authorizationStatus
+        callback?.invoke(authorizationStatus)
         callback = null
     }
 }
