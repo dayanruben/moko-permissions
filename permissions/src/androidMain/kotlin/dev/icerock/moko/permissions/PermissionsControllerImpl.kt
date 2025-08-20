@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -26,7 +27,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
-import kotlin.coroutines.suspendCoroutine
 
 @Suppress("TooManyFunctions")
 class PermissionsControllerImpl(
@@ -38,11 +38,12 @@ class PermissionsControllerImpl(
 
     private val launcherHolder = MutableStateFlow<ActivityResultLauncher<Array<String>>?>(null)
 
-    private var permissionCallback: PermissionCallback? = null
+    private val permissionRequestResultFlow = MutableSharedFlow<PermissionRequestResult>(extraBufferCapacity = 1)
 
     private val key = UUID.randomUUID().toString()
 
     override fun bind(activity: ComponentActivity) {
+        unbindActivity()
         this.activityHolder.value = activity
         val activityResultRegistryOwner = activity as ActivityResultRegistryOwner
 
@@ -52,28 +53,20 @@ class PermissionsControllerImpl(
         ) { permissions ->
             val isCancelled = permissions.isEmpty()
 
-            val permissionCallback = permissionCallback ?: return@register
-
             if (isCancelled) {
-                permissionCallback.callback.invoke(
-                    Result.failure(RequestCanceledException(permissionCallback.permission))
-                )
+                permissionRequestResultFlow.tryEmit(PermissionRequestResult.CANCELLED)
                 return@register
             }
 
             val success = permissions.values.all { it }
 
             if (success) {
-                permissionCallback.callback.invoke(Result.success(Unit))
+                permissionRequestResultFlow.tryEmit(PermissionRequestResult.GRANTED)
             } else {
                 if (shouldShowRequestPermissionRationale(activity, permissions.keys.first())) {
-                    permissionCallback.callback.invoke(
-                        Result.failure(DeniedException(permissionCallback.permission))
-                    )
+                    permissionRequestResultFlow.tryEmit(PermissionRequestResult.DENIED)
                 } else {
-                    permissionCallback.callback.invoke(
-                        Result.failure(DeniedAlwaysException(permissionCallback.permission))
-                    )
+                    permissionRequestResultFlow.tryEmit(PermissionRequestResult.DENIED_ALWAYS)
                 }
             }
         }
@@ -83,8 +76,7 @@ class PermissionsControllerImpl(
         val observer = object : LifecycleEventObserver {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 if (event == Lifecycle.Event.ON_DESTROY) {
-                    this@PermissionsControllerImpl.activityHolder.value = null
-                    this@PermissionsControllerImpl.launcherHolder.value = null
+                    unbindActivity()
                     source.lifecycle.removeObserver(this)
                 }
             }
@@ -96,24 +88,15 @@ class PermissionsControllerImpl(
         mutex.withLock {
             val launcher = awaitActivityResultLauncher()
             val platformPermission = permission.delegate.getPlatformPermission()
-            suspendCoroutine { continuation ->
-                requestPermission(
-                    launcher,
-                    permission,
-                    platformPermission
-                ) { continuation.resumeWith(it) }
+            launcher.launch(platformPermission.toTypedArray())
+
+            when (permissionRequestResultFlow.first()) {
+                PermissionRequestResult.GRANTED -> Unit
+                PermissionRequestResult.DENIED -> throw DeniedException(permission)
+                PermissionRequestResult.DENIED_ALWAYS -> throw DeniedAlwaysException(permission)
+                PermissionRequestResult.CANCELLED -> throw RequestCanceledException(permission)
             }
         }
-    }
-
-    private fun requestPermission(
-        launcher: ActivityResultLauncher<Array<String>>,
-        permission: Permission,
-        permissions: List<String>,
-        callback: (Result<Unit>) -> Unit
-    ) {
-        permissionCallback = PermissionCallback(permission, callback)
-        launcher.launch(permissions.toTypedArray())
     }
 
     private suspend fun awaitActivityResultLauncher(): ActivityResultLauncher<Array<String>> {
@@ -194,12 +177,17 @@ class PermissionsControllerImpl(
         applicationContext.startActivity(intent)
     }
 
+    private fun unbindActivity() {
+        launcherHolder.value?.unregister()
+        activityHolder.value = null
+        launcherHolder.value = null
+    }
+
     private companion object {
         private const val AWAIT_ACTIVITY_TIMEOUT_DURATION_MS = 2000L
     }
 }
 
-private class PermissionCallback(
-    val permission: Permission,
-    val callback: (Result<Unit>) -> Unit
-)
+private enum class PermissionRequestResult {
+    GRANTED, DENIED, DENIED_ALWAYS, CANCELLED
+}
