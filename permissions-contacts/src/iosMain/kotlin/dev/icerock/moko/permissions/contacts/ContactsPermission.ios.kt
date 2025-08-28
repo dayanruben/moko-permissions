@@ -24,7 +24,7 @@ private class ContactsPermissionDelegate(
     private val contactStore = CNContactStore()
 
     override suspend fun providePermission() {
-        return provideLocationPermission(
+        return providePermission(
             CNContactStore.authorizationStatusForEntityType(
                 CNEntityType.CNEntityTypeContacts
             )
@@ -43,15 +43,12 @@ private class ContactsPermissionDelegate(
         }
     }
 
-    private suspend fun provideLocationPermission(
-        status: CNAuthorizationStatus
-    ) {
+    private suspend fun providePermission(status: CNAuthorizationStatus) {
         when (status) {
             CNAuthorizationStatusAuthorized,
-            CNAuthorizationStatusRestricted -> return
+            CNAuthorizationStatusLimited -> return
 
             CNAuthorizationStatusNotDetermined -> {
-                //  用户未选择权限，发起权限申请
                 val newStatus = suspendCoroutine<CNAuthorizationStatus> { continuation ->
                     contactStore.requestAccessForEntityType(CNEntityType.CNEntityTypeContacts) { _, _ ->
                         continuation.resume(
@@ -61,10 +58,10 @@ private class ContactsPermissionDelegate(
                         )
                     }
                 }
-                provideLocationPermission(newStatus)
+                providePermission(newStatus)
             }
 
-            CNAuthorizationStatusDenied -> throw DeniedAlwaysException(permission)
+            CNAuthorizationStatusDenied, CNAuthorizationStatusRestricted -> throw DeniedAlwaysException(permission)
             else -> error("unknown location authorization status $status")
         }
     }
