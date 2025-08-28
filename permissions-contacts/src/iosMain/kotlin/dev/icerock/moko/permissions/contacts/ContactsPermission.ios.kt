@@ -58,7 +58,7 @@ private class ContactsPermissionDelegate(
                         )
                     }
                 }
-                provideLocationPermission(newStatus)
+                providePermission(newStatus)
             }
 
             CNAuthorizationStatusDenied, CNAuthorizationStatusRestricted -> throw DeniedAlwaysException(permission)
