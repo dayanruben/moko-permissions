@@ -39,23 +39,23 @@ allprojects {
 project **build.gradle**
 ```groovy
 dependencies {
-    commonMainApi("dev.icerock.moko:permissions:0.20.0")
+    commonMainApi("dev.icerock.moko:permissions:0.20.1")
   
     // specific permissions support
-    commonMainImplementation("dev.icerock.moko:permissions-bluetooth:0.20.0")
-    commonMainImplementation("dev.icerock.moko:permissions-camera:0.20.0")
-    commonMainImplementation("dev.icerock.moko:permissions-contacts:0.20.0")
-    commonMainImplementation("dev.icerock.moko:permissions-gallery:0.20.0")
-    commonMainImplementation("dev.icerock.moko:permissions-location:0.20.0")
-    commonMainImplementation("dev.icerock.moko:permissions-microphone:0.20.0")
-    commonMainImplementation("dev.icerock.moko:permissions-motion:0.20.0")
-    commonMainImplementation("dev.icerock.moko:permissions-notifications:0.20.0")
-    commonMainImplementation("dev.icerock.moko:permissions-storage:0.20.0")
+    commonMainImplementation("dev.icerock.moko:permissions-bluetooth:0.20.1")
+    commonMainImplementation("dev.icerock.moko:permissions-camera:0.20.1")
+    commonMainImplementation("dev.icerock.moko:permissions-contacts:0.20.1")
+    commonMainImplementation("dev.icerock.moko:permissions-gallery:0.20.1")
+    commonMainImplementation("dev.icerock.moko:permissions-location:0.20.1")
+    commonMainImplementation("dev.icerock.moko:permissions-microphone:0.20.1")
+    commonMainImplementation("dev.icerock.moko:permissions-motion:0.20.1")
+    commonMainImplementation("dev.icerock.moko:permissions-notifications:0.20.1")
+    commonMainImplementation("dev.icerock.moko:permissions-storage:0.20.1")
     
     // compose multiplatform
-    commonMainApi("dev.icerock.moko:permissions-compose:0.20.0") // permissions api + compose extensions
+    commonMainApi("dev.icerock.moko:permissions-compose:0.20.1") // permissions api + compose extensions
     
-    commonTestImplementation("dev.icerock.moko:permissions-test:0.20.0")
+    commonTestImplementation("dev.icerock.moko:permissions-test:0.20.1")
 }
 ```
 
