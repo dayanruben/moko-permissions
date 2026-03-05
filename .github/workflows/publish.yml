@@ -10,6 +10,7 @@ on:
 
 jobs:
   publish:
+    if: github.repository == 'icerockdev/moko-permissions'
     name: Publish library at mavenCentral
     runs-on: macOS-latest
     env:
@@ -31,6 +32,7 @@ jobs:
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
 
   release:
+    if: github.repository == 'icerockdev/moko-permissions'
     name: Create release
     needs: publish
     runs-on: ubuntu-latest
