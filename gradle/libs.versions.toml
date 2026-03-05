@@ -1,5 +1,5 @@
 [versions]
-kotlinVersion = "1.9.10"
+kotlinVersion = "2.3.20-RC2"
 androidAppCompatVersion = "1.6.1"
 androidxCoreVersion = "1.9.0" # TODO we have two versions (1.8 + 1.9) - unify them
 composeMaterialVersion = "1.4.1"
