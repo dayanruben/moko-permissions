@@ -4,9 +4,7 @@
 
 package dev.icerock.moko.permissions.test
 
-import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
-import dev.icerock.moko.permissions.PermissionState
 import dev.icerock.moko.permissions.PermissionsController
 
 expect abstract class PermissionsControllerMock constructor() : PermissionsController {
