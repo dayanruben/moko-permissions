@@ -2,6 +2,7 @@ plugins {
     id("dev.icerock.moko.gradle.android.application")
     id("dev.icerock.moko.gradle.detekt")
     id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinComposeCompiler)
 }
 
 android {

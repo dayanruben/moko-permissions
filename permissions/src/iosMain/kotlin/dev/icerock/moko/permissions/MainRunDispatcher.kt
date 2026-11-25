@@ -13,6 +13,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * Simple object made to ensure dispatching to the main looper on iOS
  */
+@PublishedApi
 internal object MainRunDispatcher : CoroutineDispatcher() {
     override fun dispatch(context: CoroutineContext, block: Runnable) =
         NSRunLoop.mainRunLoop.performBlock { block.run() }
